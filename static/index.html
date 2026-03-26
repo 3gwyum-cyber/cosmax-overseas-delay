@@ -417,6 +417,21 @@ document.querySelectorAll('.tab').forEach(tab => {
     });
 });
 
+// ── Go to Data tab with filters ──
+function goToDataTab(filters = {}) {
+    // Switch to data tab
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector('[data-tab="table"]').classList.add('active');
+    document.getElementById('tab-table').classList.add('active');
+    // Reset filters first
+    document.getElementById('fGrade').value = filters.grade || '';
+    document.getElementById('fManager').value = filters.manager || '';
+    document.getElementById('fCust').value = filters.cust || '';
+    document.getElementById('fKeyword').value = filters.keyword || '';
+    renderTable();
+}
+
 // ── Filter by grade (card click) ──
 function filterByGrade(grade) {
     activeGradeFilter = grade;
@@ -454,6 +469,12 @@ function renderCharts() {
             responsive: true, maintainAspectRatio: true,
             plugins: {
                 legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 16 } }
+            },
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const gradeMap = ['정상', '3일초과', '5일초과'];
+                    goToDataTab({ grade: gradeMap[elements[0].index] });
+                }
             }
         }
     });
@@ -475,7 +496,14 @@ function renderCharts() {
         options: {
             responsive: true, maintainAspectRatio: true,
             scales: { x: { stacked: true, ticks: { font: { size: 11 } } }, y: { stacked: true, beginAtZero: true } },
-            plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 16 } } }
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 16 } } },
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const idx = elements[0].index;
+                    const mgrName = mgrNames[idx];
+                    goToDataTab({ manager: mgrName });
+                }
+            }
         }
     });
 
@@ -496,7 +524,14 @@ function renderCharts() {
         options: {
             indexAxis: 'y', responsive: true, maintainAspectRatio: false,
             scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true, ticks: { font: { size: 11 } } } },
-            plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 16 } } }
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 16 } } },
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const idx = elements[0].index;
+                    const custCode = custKeys[idx];
+                    goToDataTab({ cust: custCode });
+                }
+            }
         }
     });
     document.getElementById('chartCust').parentElement.style.height = Math.max(300, custKeys.length * 28 + 80) + 'px';
