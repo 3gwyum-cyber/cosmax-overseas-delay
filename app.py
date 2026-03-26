@@ -19,7 +19,16 @@ STATIC_DIR = BASE_DIR / "static"
 STATIC_DIR.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-DATA_FILE = BASE_DIR / "품질검사대상 - 2026-03-25T183027.167.xls"
+# 최신 업로드 파일 우선, 없으면 원본
+_latest_xls = BASE_DIR / "품질검사대상_latest.xls"
+_latest_xlsx = BASE_DIR / "품질검사대상_latest.xlsx"
+_original = BASE_DIR / "품질검사대상 - 2026-03-25T183027.167.xls"
+if _latest_xls.exists():
+    DATA_FILE = _latest_xls
+elif _latest_xlsx.exists():
+    DATA_FILE = _latest_xlsx
+else:
+    DATA_FILE = _original
 MANAGER_FILE = BASE_DIR / "완제품 해외담당.xlsx"
 HISTORY_FILE = BASE_DIR / "delay_history.json"
 
