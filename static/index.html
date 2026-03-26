@@ -148,6 +148,7 @@
         .chart-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 6px; padding: 20px; }
         .chart-card h3 { font-size: 12px; font-weight: 400; color: #888; margin-bottom: 12px; letter-spacing: 0.5px; }
         .chart-card canvas { max-height: 280px; }
+        #chartCust { max-height: none !important; }
 
         /* ── Table ── */
         .table-wrapper { background: #fff; border: 1px solid #f0f0f0; border-radius: 6px; overflow-x: auto; }
@@ -528,7 +529,9 @@ function renderCharts() {
             }
         }
     });
-    document.getElementById('chartCust').parentElement.style.height = Math.max(300, custKeys.length * 36 + 100) + 'px';
+    const chartHeight = Math.max(400, custKeys.length * 40 + 120);
+    document.getElementById('chartCust').parentElement.style.height = chartHeight + 'px';
+    document.getElementById('chartCust').style.height = chartHeight + 'px';
 }
 
 // ── Manager Cards ──
