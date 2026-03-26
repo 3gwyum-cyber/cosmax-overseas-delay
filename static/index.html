@@ -231,7 +231,7 @@
             <div class="header-title">해외영업 적합지연 모니터링</div>
         </div>
         <div class="header-right">
-            <div class="ref-date">기준일 <input type="date" id="refDateInput" value="2026-03-25"> <button class="ref-apply" onclick="changeRefDate()">적용</button></div>
+            <div class="ref-date">기준일 <input type="date" id="refDateInput"> <button class="ref-apply" onclick="changeRefDate()">적용</button></div>
             <button class="upload-btn" onclick="toggleUpload()">Upload</button>
             <div class="header-badge">시험중 <strong id="totalBadge">0</strong> cases</div>
         </div>
@@ -375,7 +375,7 @@ let activeGradeFilter = '';
 let activeMgrFilter = '';
 let chartPie = null, chartBar = null, chartCust = null;
 
-let currentRefDate = '2026-03-25';
+let currentRefDate = new Date().toISOString().slice(0, 10);  // 오늘 날짜
 
 function changeRefDate() {
     currentRefDate = document.getElementById('refDateInput').value;

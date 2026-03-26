@@ -32,16 +32,13 @@ HOLIDAYS = {
     datetime(2026,10,3).date(), datetime(2026,10,9).date(), datetime(2026,12,25).date(),
 }
 
-DEFAULT_REF_DATE = datetime(2026, 3, 25)  # 기본 기준일
-
-
 def parse_ref_date(date_str: Optional[str] = None):
     if date_str:
         try:
             return datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
             pass
-    return DEFAULT_REF_DATE
+    return datetime.now()  # 기본값: 오늘
 
 
 def working_days_between(start, end):
@@ -87,7 +84,7 @@ def load_managers():
 
 def load_data(filepath=None, ref_date=None):
     fp = filepath or str(DATA_FILE)
-    rd = ref_date or DEFAULT_REF_DATE
+    rd = ref_date or datetime.now()
     df = pd.read_excel(fp)
     df['입고일자'] = pd.to_datetime(df['입고일자'], errors='coerce')
     df['판정일자'] = pd.to_datetime(df['판정일자'], errors='coerce')

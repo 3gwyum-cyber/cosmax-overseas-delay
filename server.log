@@ -93,3 +93,25 @@ INFO:     127.0.0.1:47566 - "GET /api/filters HTTP/1.1" 200 OK
 INFO:     127.0.0.1:50724 - "GET / HTTP/1.1" 200 OK
 INFO:     127.0.0.1:50724 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
 INFO:     127.0.0.1:50724 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45758 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45758 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45758 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52754 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52754 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52754 - "GET /api/filters HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1572821]
+INFO:     Started server process [1575848]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1575848]
+INFO:     Started server process [1575871]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
