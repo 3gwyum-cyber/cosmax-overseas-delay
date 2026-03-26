@@ -132,3 +132,19 @@ INFO:     Finished server process [1575871]
 INFO:     Started server process [1579353]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1579353]
+INFO:     Started server process [1579976]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1579976]
+INFO:     Started server process [1580007]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

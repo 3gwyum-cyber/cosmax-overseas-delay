@@ -150,19 +150,27 @@ async def get_data(ref_date: Optional[str] = Query(None)):
         elif g == '3일초과': mgr_stats[mgr]['over3'] += 1
         elif g == '5일초과': mgr_stats[mgr]['over5'] += 1
         # 고객사별 세부
+        cust_nm = r['고객사'] if pd.notna(r.get('고객사')) else ''
         if cust not in mgr_stats[mgr]['by_cust']:
-            mgr_stats[mgr]['by_cust'][cust] = {'total': 0, 'normal': 0, 'over3': 0, 'over5': 0}
+            mgr_stats[mgr]['by_cust'][cust] = {'total': 0, 'normal': 0, 'over3': 0, 'over5': 0, 'name': cust_nm}
         mgr_stats[mgr]['by_cust'][cust]['total'] += 1
         if g == '정상': mgr_stats[mgr]['by_cust'][cust]['normal'] += 1
         elif g == '3일초과': mgr_stats[mgr]['by_cust'][cust]['over3'] += 1
         elif g == '5일초과': mgr_stats[mgr]['by_cust'][cust]['over5'] += 1
+
+    # 고객사코드 → 고객사명 매핑
+    cust_name_map = {}
+    for _, r in testing.iterrows():
+        c = r['고객사코드'] if pd.notna(r['고객사코드']) else '기타'
+        if c not in cust_name_map and pd.notna(r.get('고객사')):
+            cust_name_map[c] = r['고객사']
 
     # 고객사코드별 통계
     cust_stats = {}
     for _, r in testing.iterrows():
         c = r['고객사코드'] if pd.notna(r['고객사코드']) else '기타'
         if c not in cust_stats:
-            cust_stats[c] = {'total': 0, 'over3': 0, 'over5': 0}
+            cust_stats[c] = {'total': 0, 'over3': 0, 'over5': 0, 'name': cust_name_map.get(c, '')}
         cust_stats[c]['total'] += 1
         g = r['지연등급']
         if g == '3일초과': cust_stats[c]['over3'] += 1

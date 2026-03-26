@@ -504,11 +504,12 @@ function renderCharts() {
     const cust = DATA.cust_stats;
     const custKeys = Object.keys(cust).filter(k => cust[k].over3 + cust[k].over5 > 0)
         .sort((a,b) => (cust[b].over3+cust[b].over5) - (cust[a].over3+cust[a].over5)).slice(0, 20);
+    const custLabels = custKeys.map(k => cust[k].name ? `${k} (${cust[k].name})` : k);
     if (chartCust) chartCust.destroy();
     chartCust = new Chart(document.getElementById('chartCust'), {
         type: 'bar',
         data: {
-            labels: custKeys,
+            labels: custLabels,
             datasets: [
                 { label: '3일초과', data: custKeys.map(k => cust[k].over3), backgroundColor: '#f57c00' },
                 { label: '5일초과', data: custKeys.map(k => cust[k].over5), backgroundColor: '#e53935' },
@@ -547,7 +548,8 @@ function renderMgrCards() {
         const custSummary = custList.map(([code, cs]) => {
             const delayed = cs.over3 + cs.over5;
             const color = cs.over5 > 0 ? '#e53935' : delayed > 0 ? '#f57c00' : '#43a047';
-            return `<span style="display:inline-flex;align-items:center;gap:2px;margin-right:6px;margin-bottom:3px;padding:2px 7px;background:#f8f8f8;border-radius:3px;font-size:10px;border-left:2px solid ${color}">
+            const cName = cs.name || '';
+            return `<span style="display:inline-flex;align-items:center;gap:2px;margin-right:6px;margin-bottom:3px;padding:2px 7px;background:#f8f8f8;border-radius:3px;font-size:10px;border-left:2px solid ${color}" title="${cName}">
                 <span style="font-weight:600;color:#333">${code}</span>
                 <span style="color:#999">${cs.total}</span>
                 ${delayed > 0 ? `<span style="color:${color};font-weight:600">(${delayed})</span>` : ''}
@@ -594,9 +596,11 @@ function renderMgrDetail() {
         const s = byCust[c];
         const delayed = s.over3 + s.over5;
         const barTotal = s.total || 1;
+        const custName = s.name || '';
         return `<div class="cust-mini" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.15s" onclick="filterMgrCust('${c}')" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
             <span style="font-weight:700;font-size:18px;min-width:36px;color:#1a1a1a">${s.total}</span>
             <span style="font-weight:600;font-size:14px;min-width:44px;color:#555">${c}</span>
+            <span style="font-size:11px;color:#aaa">${custName}</span>
             <div style="flex:1;display:flex;gap:2px;height:8px;">
                 <div style="width:${s.normal/barTotal*100}%;background:#43a047;border-radius:4px"></div>
                 <div style="width:${s.over3/barTotal*100}%;background:#f57c00;border-radius:4px"></div>
