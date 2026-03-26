@@ -176,3 +176,28 @@ INFO:     127.0.0.1:47690 - "GET /api/filters HTTP/1.1" 200 OK
 INFO:     127.0.0.1:46802 - "GET / HTTP/1.1" 200 OK
 INFO:     127.0.0.1:46802 - "GET /api/data?ref_date=2026-03-26 HTTP/1.1" 200 OK
 INFO:     127.0.0.1:46802 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45802 - "GET / HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1580650]
+INFO:     Started server process [1624460]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1624460]
+INFO:     Started server process [1624532]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1624532]
+INFO:     Started server process [1625102]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

@@ -322,12 +322,15 @@
                             <th style="width:55px" onclick="sortTable('cust_code')">약호</th>
                             <th style="width:100px">시험번호</th>
                             <th style="width:100px">품목코드</th>
+                            <th style="width:80px">LOT</th>
                             <th style="width:260px" onclick="sortTable('product_name')">품목명</th>
                             <th style="width:90px" onclick="sortTable('in_date')">입고일자</th>
                             <th style="width:65px">판정담당</th>
                             <th style="width:65px">마케터</th>
+                            <th style="width:70px">수량</th>
                             <th style="width:70px">입고유형</th>
                             <th style="width:100px">관리유형</th>
+                            <th style="width:200px">판정의견</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -713,12 +716,15 @@ function renderTable() {
         <td>${r.cust_code}</td>
         <td style="font-size:11px;color:#888">${r.test_no}</td>
         <td style="font-size:11px;color:#888">${r.product_code}</td>
+        <td style="font-size:11px">${r.lot || r.supplier_lot || ''}</td>
         <td class="product-name">${r.product_name}</td>
         <td>${r.in_date}</td>
         <td>${r.judge}</td>
         <td>${r.marketer}</td>
+        <td style="text-align:right">${r.qty ? r.qty.toLocaleString() : ''}</td>
         <td>${r.in_type}</td>
         <td style="font-size:11px">${r.mgmt_type}</td>
+        <td style="font-size:10px;max-width:200px;white-space:pre-wrap;word-break:break-word;color:#666;">${r.opinion}</td>
     </tr>`).join('');
 }
 

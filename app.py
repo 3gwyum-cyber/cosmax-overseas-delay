@@ -118,8 +118,8 @@ def load_data(filepath=None, ref_date=None):
         valid_codes = set(mgr_map.keys())
         df = df[df['고객사코드'].isin(valid_codes)].copy()
 
-    # 코스맥스유어로 제품 제외
-    df = df[~df['품목명'].str.contains('코스맥스유어로', na=False)].copy()
+    # 코스맥스유어로, 시생산 제품 제외
+    df = df[~df['품목명'].str.contains('코스맥스유어로|시생산', na=False)].copy()
 
     return df
 
@@ -197,6 +197,10 @@ async def get_data(ref_date: Optional[str] = Query(None)):
             'customer': r['고객사'] if pd.notna(r['고객사']) else '',
             'in_type': r['입고유형'] if pd.notna(r['입고유형']) else '',
             'mgmt_type': r['관리유형'] if pd.notna(r['관리유형']) else '',
+            'lot': r['LOT'] if 'LOT' in r.index and pd.notna(r['LOT']) else (r['고객사 Lot No.'] if '고객사 Lot No.' in r.index and pd.notna(r['고객사 Lot No.']) else ''),
+            'supplier_lot': r['공급업체\n롯트번호'] if '공급업체\n롯트번호' in r.index and pd.notna(r['공급업체\n롯트번호']) else (r.get('공급업체<br>롯트번호','') if pd.notna(r.get('공급업체<br>롯트번호','')) else ''),
+            'opinion': r['판정의견'] if '판정의견' in r.index and pd.notna(r['판정의견']) else '',
+            'qty': int(r['입고수량']) if '입고수량' in r.index and pd.notna(r['입고수량']) else '',
         })
 
     rows.sort(key=lambda x: -x['wd'])
