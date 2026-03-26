@@ -118,6 +118,9 @@ def load_data(filepath=None, ref_date=None):
         valid_codes = set(mgr_map.keys())
         df = df[df['고객사코드'].isin(valid_codes)].copy()
 
+    # 코스맥스유어로 제품 제외
+    df = df[~df['품목명'].str.contains('코스맥스유어로', na=False)].copy()
+
     return df
 
 
