@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>해외영업 적합지연 모니터링</title>
+    <script src="/static/chart.umd.min.js"></script>
+    <style>
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Malgun Gothic', -apple-system, sans-serif;
+            background: #ffffff; color: #1a1a1a;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: #fff; border-bottom: 1px solid #f0f0f0;
+            padding: 18px 40px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-left { display: flex; align-items: center; gap: 24px; }
+        .logo img { height: 32px; }
+        .header-title {
+            font-size: 12px; color: #aaa; font-weight: 300;
+            padding-left: 24px; border-left: 1px solid #e0e0e0;
+            letter-spacing: 0.5px;
+        }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .header-badge { font-size: 13px; color: #999; font-weight: 300; }
+        .header-badge strong { color: #1a1a1a; font-size: 18px; font-weight: 600; }
+        .ref-date { font-size: 11px; color: #aaa; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+        .ref-date input[type="date"] {
+            padding: 4px 8px; border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 12px; font-family: inherit; color: #1a1a1a; font-weight: 600;
+            background: #fff; cursor: pointer;
+        }
+        .ref-date input[type="date"]:focus { outline: none; border-color: #e53935; }
+        .ref-apply {
+            padding: 4px 12px; border: 1px solid #e0e0e0; border-radius: 4px;
+            background: #1a1a1a; color: #fff; font-size: 11px; cursor: pointer;
+            font-family: inherit; letter-spacing: 0.5px;
+        }
+        .ref-apply:hover { background: #333; }
+
+        .upload-btn {
+            padding: 5px 14px; border: 1px solid #e0e0e0; border-radius: 4px;
+            background: #fff; color: #1a1a1a; font-size: 11px; cursor: pointer;
+            font-family: inherit; letter-spacing: 0.5px; transition: all 0.2s;
+        }
+        .upload-btn:hover { border-color: #e53935; color: #e53935; }
+        .upload-panel {
+            display: none; position: fixed; top: 0; right: 0; width: 360px; height: 100vh;
+            background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,0.08); z-index: 100;
+            padding: 24px; overflow-y: auto; transition: all 0.3s;
+        }
+        .upload-panel.open { display: block; }
+        .upload-panel h3 {
+            font-size: 14px; font-weight: 600; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .upload-panel .close-btn {
+            background: none; border: none; font-size: 20px; cursor: pointer; color: #999; line-height: 1;
+        }
+        .upload-panel .close-btn:hover { color: #333; }
+        .upload-section { margin-bottom: 24px; }
+        .upload-section label {
+            display: block; font-size: 10px; font-weight: 500; color: #bbb;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+        }
+        .upload-drop {
+            border: 2px dashed #e0e0e0; border-radius: 8px; padding: 24px;
+            text-align: center; cursor: pointer; transition: all 0.2s;
+            background: #fafafa;
+        }
+        .upload-drop:hover { border-color: #e53935; background: #fff5f5; }
+        .upload-drop.dragover { border-color: #e53935; background: #fff5f5; }
+        .upload-drop p { font-size: 12px; color: #999; margin-bottom: 4px; }
+        .upload-drop .icon { font-size: 24px; margin-bottom: 8px; color: #ccc; }
+        .upload-drop input { display: none; }
+        .upload-status {
+            margin-top: 8px; font-size: 11px; padding: 6px 10px; border-radius: 4px;
+        }
+        .upload-status.success { background: #e8f5e9; color: #2e7d32; }
+        .upload-status.error { background: #ffebee; color: #c62828; }
+        .upload-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.15); z-index: 99;
+        }
+        .upload-overlay.open { display: block; }
+
+        .container { max-width: 1440px; margin: 0 auto; padding: 24px 40px; }
+
+        /* ── Stats Cards ── */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff; border: 1px solid #f0f0f0; border-radius: 6px;
+            padding: 16px 20px; text-align: center; transition: all 0.2s; cursor: pointer;
+        }
+        .stat-card:hover { border-color: #ddd; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+        .stat-card .label {
+            font-size: 10px; color: #bbb; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 4px; font-weight: 400;
+        }
+        .stat-card .value { font-size: 28px; font-weight: 600; color: #1a1a1a; }
+        .stat-card .sub { font-size: 11px; color: #ccc; margin-top: 2px; }
+        .stat-card.card-total .value { color: #1a1a1a; }
+        .stat-card.card-normal .value { color: #43a047; }
+        .stat-card.card-over3 .value { color: #f57c00; }
+        .stat-card.card-over5 .value { color: #e53935; }
+        .stat-card.active { border-color: #1a1a1a; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+        /* ── Tabs ── */
+        .tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid #f0f0f0; }
+        .tab {
+            padding: 12px 24px; cursor: pointer; font-size: 12px; font-weight: 400;
+            color: #bbb; border-bottom: 2px solid transparent; transition: all 0.2s;
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+        .tab:hover { color: #666; }
+        .tab.active { color: #1a1a1a; border-bottom-color: #e53935; font-weight: 500; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── Filter Bar ── */
+        .filter-bar {
+            background: #fff; border: 1px solid #f0f0f0; border-radius: 8px;
+            padding: 14px 20px; margin-bottom: 20px;
+            display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+        }
+        .filter-group { display: flex; align-items: center; gap: 4px; }
+        .filter-bar label { font-size: 10px; font-weight: 500; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+        .filter-bar select, .filter-bar input {
+            padding: 6px 10px; border: 1px solid #e8e8e8; border-radius: 4px;
+            font-size: 12px; background: #fff; color: #333; font-family: inherit;
+        }
+        .filter-bar select:focus, .filter-bar input:focus { outline: none; border-color: #e53935; }
+        .btn { padding: 7px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 400; font-family: inherit; letter-spacing: 0.5px; }
+        .btn-primary { background: #1a1a1a; color: white; }
+        .btn-primary:hover { background: #333; }
+        .btn-secondary { background: #f5f5f5; color: #888; }
+        .btn-secondary:hover { background: #eee; }
+
+        /* ── Charts ── */
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .chart-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 6px; padding: 20px; }
+        .chart-card h3 { font-size: 12px; font-weight: 400; color: #888; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .chart-card canvas { max-height: 280px; }
+
+        /* ── Table ── */
+        .table-wrapper { background: #fff; border: 1px solid #f0f0f0; border-radius: 6px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        thead th {
+            background: #fafafa; color: #888; padding: 10px 12px; text-align: left;
+            white-space: nowrap; position: sticky; top: 0; z-index: 10;
+            font-weight: 400; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+            border-bottom: 1px solid #e8e8e8; cursor: pointer;
+        }
+        thead th:hover { background: #f0f0f0; }
+        tbody td { padding: 8px 12px; border-bottom: 1px solid #f5f5f5; vertical-align: top; color: #444; }
+        tbody tr:hover { background: #fafafa; }
+
+        .grade-badge {
+            display: inline-block; padding: 2px 10px; border-radius: 4px;
+            font-weight: 600; font-size: 11px; text-align: center; min-width: 60px;
+        }
+        .grade-normal { background: #e8f5e9; color: #2e7d32; }
+        .grade-over3 { background: #fff3e0; color: #e65100; }
+        .grade-over5 { background: #ffebee; color: #c62828; }
+
+        .wd-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-weight: 600; font-size: 12px; min-width: 30px; text-align: center;
+        }
+        .wd-normal { background: #f5f5f5; color: #666; }
+        .wd-warn { background: #fff3e0; color: #e65100; }
+        .wd-danger { background: #ffebee; color: #c62828; font-weight: 700; }
+
+        /* ── Manager Cards ── */
+        .mgr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 24px; }
+        .mgr-card {
+            background: #fff; border: 1px solid #f0f0f0; border-radius: 6px;
+            padding: 16px; cursor: pointer; transition: all 0.2s;
+        }
+        .mgr-card:hover { border-color: #ddd; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+        .mgr-card.active { border-color: #e53935; }
+        .mgr-name { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .mgr-bar { display: flex; gap: 4px; margin-bottom: 6px; }
+        .mgr-bar-seg { height: 6px; border-radius: 3px; }
+        .mgr-bar-normal { background: #43a047; }
+        .mgr-bar-over3 { background: #f57c00; }
+        .mgr-bar-over5 { background: #e53935; }
+        .mgr-nums { display: flex; gap: 12px; font-size: 11px; color: #999; }
+        .mgr-nums span strong { font-weight: 600; }
+        .mgr-nums .n-normal strong { color: #43a047; }
+        .mgr-nums .n-over3 strong { color: #f57c00; }
+        .mgr-nums .n-over5 strong { color: #e53935; }
+
+        .product-name { max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-name:hover { white-space: normal; word-break: break-all; }
+
+        .no-data { text-align: center; padding: 60px; color: #ccc; font-size: 14px; }
+
+        /* ── Quick Filter Buttons ── */
+        .quick-filter { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .quick-filter-label { font-size: 10px; font-weight: 400; color: #bbb; margin-right: 4px; letter-spacing: 1px; text-transform: uppercase; }
+        .quick-btn {
+            padding: 5px 14px; border: 1px solid #e8e8e8; border-radius: 4px;
+            background: #fff; font-size: 11px; font-family: inherit; cursor: pointer;
+            color: #888; transition: all 0.15s; letter-spacing: 0.5px;
+        }
+        .quick-btn:hover { border-color: #ccc; color: #333; }
+        .quick-btn.active { background: #1a1a1a; color: white; border-color: #1a1a1a; }
+
+        .table-count { font-size: 11px; color: #bbb; margin-bottom: 8px; letter-spacing: 0.5px; }
+
+        @media (max-width: 768px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .container { padding: 16px; }
+            .header { padding: 16px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="logo"><img src="/static/images/cosmax_logo.png" alt="COSMAX"></div>
+            <div class="header-title">해외영업 적합지연 모니터링</div>
+        </div>
+        <div class="header-right">
+            <div class="ref-date">기준일 <input type="date" id="refDateInput" value="2026-03-25"> <button class="ref-apply" onclick="changeRefDate()">적용</button></div>
+            <button class="upload-btn" onclick="toggleUpload()">Upload</button>
+            <div class="header-badge">시험중 <strong id="totalBadge">0</strong> cases</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Summary Cards -->
+        <div class="stats-grid">
+            <div class="stat-card card-total" onclick="filterByGrade('')">
+                <div class="label">전체 시험중</div>
+                <div class="value" id="sTotal">-</div>
+            </div>
+            <div class="stat-card card-normal" onclick="filterByGrade('정상')">
+                <div class="label">정상 (3일 이내)</div>
+                <div class="value" id="sNormal">-</div>
+            </div>
+            <div class="stat-card card-over3" onclick="filterByGrade('3일초과')">
+                <div class="label">3일 초과</div>
+                <div class="value" id="sOver3">-</div>
+            </div>
+            <div class="stat-card card-over5" onclick="filterByGrade('5일초과')">
+                <div class="label">5일 초과</div>
+                <div class="value" id="sOver5">-</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-tab="overview">Overview</div>
+            <div class="tab" data-tab="manager">담당자별</div>
+            <div class="tab" data-tab="table">Data</div>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>지연등급 분포</h3>
+                    <canvas id="chartPie"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>담당자별 지연 현황</h3>
+                    <canvas id="chartBar"></canvas>
+                </div>
+            </div>
+            <div class="chart-card" style="margin-bottom:24px">
+                <h3>고객사코드별 지연 건수 (3일 초과 이상)</h3>
+                <canvas id="chartCust"></canvas>
+            </div>
+        </div>
+
+        <!-- Manager Tab -->
+        <div id="tab-manager" class="tab-content">
+            <div class="mgr-grid" id="mgrGrid"></div>
+            <div id="mgrDetail"></div>
+        </div>
+
+        <!-- Data Tab -->
+        <div id="tab-table" class="tab-content">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>등급</label>
+                    <select id="fGrade"><option value="">전체</option>
+                        <option value="정상">정상</option>
+                        <option value="3일초과">3일초과</option>
+                        <option value="5일초과">5일초과</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>담당자</label>
+                    <select id="fManager"><option value="">전체</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>고객사</label>
+                    <select id="fCust"><option value="">전체</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>키워드</label>
+                    <input type="text" id="fKeyword" placeholder="품목명 검색..." style="width:140px">
+                </div>
+                <button class="btn btn-primary" onclick="renderTable()">검색</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+            </div>
+            <div class="table-count" id="tableCount"></div>
+            <div class="table-wrapper" style="max-height:600px; overflow-y:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:75px" onclick="sortTable('grade')">등급</th>
+                            <th style="width:50px" onclick="sortTable('wd')">WD</th>
+                            <th style="width:65px" onclick="sortTable('manager')">담당자</th>
+                            <th style="width:55px" onclick="sortTable('cust_code')">약호</th>
+                            <th style="width:100px">시험번호</th>
+                            <th style="width:100px">품목코드</th>
+                            <th style="width:260px" onclick="sortTable('product_name')">품목명</th>
+                            <th style="width:90px" onclick="sortTable('in_date')">입고일자</th>
+                            <th style="width:65px">판정담당</th>
+                            <th style="width:65px">마케터</th>
+                            <th style="width:70px">입고유형</th>
+                            <th style="width:100px">관리유형</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Overlay & Panel -->
+    <div class="upload-overlay" id="uploadOverlay" onclick="toggleUpload()"></div>
+    <div class="upload-panel" id="uploadPanel">
+        <h3>파일 업로드 <button class="close-btn" onclick="toggleUpload()">&times;</button></h3>
+
+        <div class="upload-section">
+            <label>품질검사대상 엑셀</label>
+            <div class="upload-drop" id="dropData" onclick="document.getElementById('fileData').click()">
+                <div class="icon">&#128196;</div>
+                <p>클릭 또는 파일을 드래그하세요</p>
+                <p style="font-size:10px;color:#ccc">.xls / .xlsx</p>
+                <input type="file" id="fileData" accept=".xls,.xlsx">
+            </div>
+            <div id="statusData"></div>
+        </div>
+
+        <div class="upload-section">
+            <label>완제품 해외담당 (선택)</label>
+            <div class="upload-drop" id="dropManager" onclick="document.getElementById('fileManager').click()">
+                <div class="icon">&#128100;</div>
+                <p>클릭 또는 파일을 드래그하세요</p>
+                <p style="font-size:10px;color:#ccc">.xls / .xlsx</p>
+                <input type="file" id="fileManager" accept=".xls,.xlsx">
+            </div>
+            <div id="statusManager"></div>
+        </div>
+    </div>
+
+<script>
+let DATA = null;
+let currentSort = { key: 'wd', asc: false };
+let activeGradeFilter = '';
+let activeMgrFilter = '';
+let chartPie = null, chartBar = null, chartCust = null;
+
+let currentRefDate = '2026-03-25';
+
+function changeRefDate() {
+    currentRefDate = document.getElementById('refDateInput').value;
+    init();
+}
+
+// ── Init ──
+async function init() {
+    const res = await fetch('/api/data?ref_date=' + currentRefDate);
+    DATA = await res.json();
+
+    document.getElementById('refDateInput').value = DATA.ref_date;
+    document.getElementById('totalBadge').textContent = DATA.summary.total;
+    document.getElementById('sTotal').textContent = DATA.summary.total;
+    document.getElementById('sNormal').textContent = DATA.summary.normal;
+    document.getElementById('sOver3').textContent = DATA.summary.over3;
+    document.getElementById('sOver5').textContent = DATA.summary.over5;
+
+    // Populate filters
+    const fRes = await fetch('/api/filters');
+    const filters = await fRes.json();
+    const fMgr = document.getElementById('fManager');
+    filters.managers.forEach(m => { const o = document.createElement('option'); o.value = m; o.textContent = m; fMgr.appendChild(o); });
+    const fCust = document.getElementById('fCust');
+    filters.customers.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; fCust.appendChild(o); });
+
+    renderCharts();
+    renderMgrCards();
+    renderTable();
+}
+
+// ── Tabs ──
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+});
+
+// ── Filter by grade (card click) ──
+function filterByGrade(grade) {
+    activeGradeFilter = grade;
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    if (grade) {
+        const map = { '정상': 1, '3일초과': 2, '5일초과': 3 };
+        document.querySelectorAll('.stat-card')[map[grade]].classList.add('active');
+    }
+    // Switch to data tab
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector('[data-tab="table"]').classList.add('active');
+    document.getElementById('tab-table').classList.add('active');
+    document.getElementById('fGrade').value = grade;
+    renderTable();
+}
+
+// ── Charts ──
+function renderCharts() {
+    const s = DATA.summary;
+
+    // Pie
+    if (chartPie) chartPie.destroy();
+    chartPie = new Chart(document.getElementById('chartPie'), {
+        type: 'doughnut',
+        data: {
+            labels: ['정상 (3일 이내)', '3일 초과', '5일 초과'],
+            datasets: [{
+                data: [s.normal, s.over3, s.over5],
+                backgroundColor: ['#43a047', '#f57c00', '#e53935'],
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 16 } }
+            }
+        }
+    });
+
+    // Bar - Manager
+    const mgr = DATA.mgr_stats;
+    const mgrNames = Object.keys(mgr).sort((a,b) => (mgr[b].over3+mgr[b].over5) - (mgr[a].over3+mgr[a].over5));
+    if (chartBar) chartBar.destroy();
+    chartBar = new Chart(document.getElementById('chartBar'), {
+        type: 'bar',
+        data: {
+            labels: mgrNames,
+            datasets: [
+                { label: '정상', data: mgrNames.map(n => mgr[n].normal), backgroundColor: '#43a047' },
+                { label: '3일초과', data: mgrNames.map(n => mgr[n].over3), backgroundColor: '#f57c00' },
+                { label: '5일초과', data: mgrNames.map(n => mgr[n].over5), backgroundColor: '#e53935' },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: true,
+            scales: { x: { stacked: true, ticks: { font: { size: 11 } } }, y: { stacked: true, beginAtZero: true } },
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 16 } } }
+        }
+    });
+
+    // Customer bar (only those with over3+over5 > 0)
+    const cust = DATA.cust_stats;
+    const custKeys = Object.keys(cust).filter(k => cust[k].over3 + cust[k].over5 > 0)
+        .sort((a,b) => (cust[b].over3+cust[b].over5) - (cust[a].over3+cust[a].over5)).slice(0, 20);
+    if (chartCust) chartCust.destroy();
+    chartCust = new Chart(document.getElementById('chartCust'), {
+        type: 'bar',
+        data: {
+            labels: custKeys,
+            datasets: [
+                { label: '3일초과', data: custKeys.map(k => cust[k].over3), backgroundColor: '#f57c00' },
+                { label: '5일초과', data: custKeys.map(k => cust[k].over5), backgroundColor: '#e53935' },
+            ]
+        },
+        options: {
+            indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+            scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true, ticks: { font: { size: 11 } } } },
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 16 } } }
+        }
+    });
+    document.getElementById('chartCust').parentElement.style.height = Math.max(300, custKeys.length * 28 + 80) + 'px';
+}
+
+// ── Manager Cards ──
+function renderMgrCards() {
+    const grid = document.getElementById('mgrGrid');
+    grid.innerHTML = '';
+    const mgr = DATA.mgr_stats;
+    const names = Object.keys(mgr).sort((a,b) => (mgr[b].over3+mgr[b].over5) - (mgr[a].over3+mgr[a].over5));
+
+    names.forEach(name => {
+        const s = mgr[name];
+        const total = s.total || 1;
+        const byCust = s.by_cust || {};
+        // 고객사별 요약 (건수 내림차순 상위 표시)
+        const custList = Object.entries(byCust)
+            .sort((a,b) => b[1].total - a[1].total);
+        const custSummary = custList.map(([code, cs]) => {
+            const delayed = cs.over3 + cs.over5;
+            const color = cs.over5 > 0 ? '#e53935' : delayed > 0 ? '#f57c00' : '#43a047';
+            return `<span style="display:inline-flex;align-items:center;gap:2px;margin-right:6px;margin-bottom:3px;padding:2px 7px;background:#f8f8f8;border-radius:3px;font-size:10px;border-left:2px solid ${color}">
+                <span style="font-weight:600;color:#333">${code}</span>
+                <span style="color:#999">${cs.total}</span>
+                ${delayed > 0 ? `<span style="color:${color};font-weight:600">(${delayed})</span>` : ''}
+            </span>`;
+        }).join('');
+
+        const card = document.createElement('div');
+        card.className = 'mgr-card';
+        card.onclick = () => {
+            activeMgrFilter = activeMgrFilter === name ? '' : name;
+            document.querySelectorAll('.mgr-card').forEach(c => c.classList.remove('active'));
+            if (activeMgrFilter) card.classList.add('active');
+            renderMgrDetail();
+        };
+        card.innerHTML = `
+            <div class="mgr-name">${name} <span style="font-size:12px;font-weight:400;color:#bbb">${s.total}건</span></div>
+            <div class="mgr-bar">
+                <div class="mgr-bar-seg mgr-bar-normal" style="width:${s.normal/total*100}%;"></div>
+                <div class="mgr-bar-seg mgr-bar-over3" style="width:${s.over3/total*100}%;"></div>
+                <div class="mgr-bar-seg mgr-bar-over5" style="width:${s.over5/total*100}%;"></div>
+            </div>
+            <div class="mgr-nums">
+                <span class="n-normal">정상 <strong>${s.normal}</strong></span>
+                <span class="n-over3">3일+ <strong>${s.over3}</strong></span>
+                <span class="n-over5">5일+ <strong>${s.over5}</strong></span>
+            </div>
+            <div style="margin-top:8px;display:flex;flex-wrap:wrap">${custSummary}</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function renderMgrDetail() {
+    const detail = document.getElementById('mgrDetail');
+    if (!activeMgrFilter) { detail.innerHTML = ''; return; }
+
+    const mgrData = DATA.mgr_stats[activeMgrFilter];
+    const byCust = mgrData ? mgrData.by_cust : {};
+    const custKeys = Object.keys(byCust).sort((a,b) => (byCust[b].over3+byCust[b].over5) - (byCust[a].over3+byCust[a].over5));
+
+    const rows = DATA.rows.filter(r => (r.manager || '미배정') === activeMgrFilter);
+
+    // 고객사별 요약 카드
+    let custHtml = custKeys.map(c => {
+        const s = byCust[c];
+        const delayed = s.over3 + s.over5;
+        const barTotal = s.total || 1;
+        return `<div class="cust-mini" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.15s" onclick="filterMgrCust('${c}')" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+            <span style="font-weight:700;font-size:18px;min-width:36px;color:#1a1a1a">${s.total}</span>
+            <span style="font-weight:600;font-size:14px;min-width:44px;color:#555">${c}</span>
+            <div style="flex:1;display:flex;gap:2px;height:8px;">
+                <div style="width:${s.normal/barTotal*100}%;background:#43a047;border-radius:4px"></div>
+                <div style="width:${s.over3/barTotal*100}%;background:#f57c00;border-radius:4px"></div>
+                <div style="width:${s.over5/barTotal*100}%;background:#e53935;border-radius:4px"></div>
+            </div>
+            <span style="font-size:13px;color:#888;min-width:120px;text-align:right">
+                <span style="color:#43a047;font-weight:500">${s.normal}</span> /
+                <span style="color:#f57c00;font-weight:700">${s.over3}</span> /
+                <span style="color:#e53935;font-weight:700">${s.over5}</span>
+            </span>
+        </div>`;
+    }).join('');
+
+    detail.innerHTML = `
+        <div class="chart-card" style="margin-bottom:16px">
+            <h3>${activeMgrFilter} — 고객사별 현황 (${custKeys.length}개사)</h3>
+            <div style="font-size:10px;color:#bbb;margin-bottom:8px;letter-spacing:0.5px">
+                <span style="color:#43a047">정상</span> / <span style="color:#f57c00">3일+</span> / <span style="color:#e53935">5일+</span> (전체)
+            </div>
+            <div style="max-height:300px;overflow-y:auto">${custHtml}</div>
+        </div>
+        <div class="chart-card">
+            <h3>${activeMgrFilter} — 상세 목록 (<span id="mgrTableCount">${rows.length}</span>건)</h3>
+            <div class="table-wrapper" style="max-height:400px;overflow-y:auto">
+                <table>
+                    <thead><tr>
+                        <th style="width:75px">등급</th><th style="width:50px">WD</th>
+                        <th style="width:55px">약호</th><th style="width:260px">품목명</th>
+                        <th style="width:90px">입고일자</th><th style="width:65px">판정담당</th>
+                        <th style="width:65px">마케터</th>
+                    </tr></thead>
+                    <tbody id="mgrTableBody">${rows.map(r => `<tr data-cust="${r.cust_code}">
+                        <td>${gradeBadge(r.grade)}</td>
+                        <td>${wdBadge(r.wd, r.grade)}</td>
+                        <td>${r.cust_code}</td>
+                        <td class="product-name">${r.product_name}</td>
+                        <td>${r.in_date}</td>
+                        <td>${r.judge}</td>
+                        <td>${r.marketer}</td>
+                    </tr>`).join('')}</tbody>
+                </table>
+            </div>
+        </div>
+    `;
+}
+
+let activeCustInMgr = '';
+function filterMgrCust(code) {
+    activeCustInMgr = activeCustInMgr === code ? '' : code;
+    const tbody = document.getElementById('mgrTableBody');
+    if (!tbody) return;
+    const trs = tbody.querySelectorAll('tr');
+    let count = 0;
+    trs.forEach(tr => {
+        if (!activeCustInMgr || tr.dataset.cust === activeCustInMgr) {
+            tr.style.display = '';
+            count++;
+        } else {
+            tr.style.display = 'none';
+        }
+    });
+    document.getElementById('mgrTableCount').textContent = count;
+    // 고객사 행 하이라이트
+    document.querySelectorAll('.cust-mini').forEach(el => {
+        el.style.background = '';
+    });
+    if (activeCustInMgr) {
+        document.querySelectorAll('.cust-mini').forEach(el => {
+            if (el.onclick.toString().includes(`'${activeCustInMgr}'`)) {
+                el.style.background = '#fafafa';
+            }
+        });
+    }
+}
+
+// ── Table ──
+function getFilteredRows() {
+    let rows = DATA.rows;
+    const grade = document.getElementById('fGrade').value;
+    const mgr = document.getElementById('fManager').value;
+    const cust = document.getElementById('fCust').value;
+    const kw = document.getElementById('fKeyword').value.trim().toLowerCase();
+
+    if (grade) rows = rows.filter(r => r.grade === grade);
+    if (mgr) rows = rows.filter(r => r.manager === mgr);
+    if (cust) rows = rows.filter(r => r.cust_code === cust);
+    if (kw) rows = rows.filter(r => r.product_name.toLowerCase().includes(kw) || r.product_code.toLowerCase().includes(kw));
+
+    // Sort
+    rows = [...rows].sort((a, b) => {
+        let va = a[currentSort.key], vb = b[currentSort.key];
+        if (typeof va === 'number') return currentSort.asc ? va - vb : vb - va;
+        va = va || ''; vb = vb || '';
+        return currentSort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+    return rows;
+}
+
+function renderTable() {
+    const rows = getFilteredRows();
+    document.getElementById('tableCount').textContent = `${rows.length}건 표시`;
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = rows.map(r => `<tr>
+        <td>${gradeBadge(r.grade)}</td>
+        <td>${wdBadge(r.wd, r.grade)}</td>
+        <td>${r.manager}</td>
+        <td>${r.cust_code}</td>
+        <td style="font-size:11px;color:#888">${r.test_no}</td>
+        <td style="font-size:11px;color:#888">${r.product_code}</td>
+        <td class="product-name">${r.product_name}</td>
+        <td>${r.in_date}</td>
+        <td>${r.judge}</td>
+        <td>${r.marketer}</td>
+        <td>${r.in_type}</td>
+        <td style="font-size:11px">${r.mgmt_type}</td>
+    </tr>`).join('');
+}
+
+function sortTable(key) {
+    if (currentSort.key === key) currentSort.asc = !currentSort.asc;
+    else { currentSort.key = key; currentSort.asc = false; }
+    renderTable();
+}
+
+function resetFilters() {
+    document.getElementById('fGrade').value = '';
+    document.getElementById('fManager').value = '';
+    document.getElementById('fCust').value = '';
+    document.getElementById('fKeyword').value = '';
+    activeGradeFilter = '';
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    renderTable();
+}
+
+// ── Helpers ──
+function gradeBadge(grade) {
+    const cls = grade === '정상' ? 'grade-normal' : grade === '3일초과' ? 'grade-over3' : 'grade-over5';
+    return `<span class="grade-badge ${cls}">${grade}</span>`;
+}
+
+function wdBadge(wd, grade) {
+    const cls = grade === '정상' ? 'wd-normal' : grade === '3일초과' ? 'wd-warn' : 'wd-danger';
+    return `<span class="wd-badge ${cls}">${wd}일</span>`;
+}
+
+// ── Upload Panel ──
+function toggleUpload() {
+    document.getElementById('uploadPanel').classList.toggle('open');
+    document.getElementById('uploadOverlay').classList.toggle('open');
+}
+
+async function uploadFile(file, endpoint, statusId) {
+    const status = document.getElementById(statusId);
+    status.innerHTML = '<div class="upload-status" style="background:#f5f5f5;color:#888">업로드 중...</div>';
+    const form = new FormData();
+    form.append('file', file);
+    try {
+        const res = await fetch(endpoint, { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.ok) {
+            status.innerHTML = `<div class="upload-status success">${data.filename} 업로드 완료</div>`;
+            init(); // 데이터 새로고침
+        } else {
+            status.innerHTML = `<div class="upload-status error">${data.error || '업로드 실패'}</div>`;
+        }
+    } catch (e) {
+        status.innerHTML = `<div class="upload-status error">오류: ${e.message}</div>`;
+    }
+}
+
+// File input change
+document.getElementById('fileData').addEventListener('change', (e) => {
+    if (e.target.files[0]) uploadFile(e.target.files[0], '/api/upload', 'statusData');
+});
+document.getElementById('fileManager').addEventListener('change', (e) => {
+    if (e.target.files[0]) uploadFile(e.target.files[0], '/api/upload-manager', 'statusManager');
+});
+
+// Drag & Drop
+['dropData', 'dropManager'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    const endpoint = i === 0 ? '/api/upload' : '/api/upload-manager';
+    const statusId = i === 0 ? 'statusData' : 'statusManager';
+    el.addEventListener('dragover', (e) => { e.preventDefault(); el.classList.add('dragover'); });
+    el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+    el.addEventListener('drop', (e) => {
+        e.preventDefault(); el.classList.remove('dragover');
+        if (e.dataTransfer.files[0]) uploadFile(e.dataTransfer.files[0], endpoint, statusId);
+    });
+});
+
+init();
+</script>
+</body>
+</html>

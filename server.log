@@ -1,0 +1,95 @@
+INFO:     Will watch for changes in these directories: ['/home/kkmoi/projects/cosmax/11thproject']
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+INFO:     Started reloader process [1567861] using StatReload
+INFO:     Started server process [1567865]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:45686 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45686 - "GET /static/chart.umd.min.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:45686 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45686 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45686 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45686 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45686 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59146 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59146 - "GET /static/chart.umd.min.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:59146 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59146 - "GET /api/filters HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1567865]
+INFO:     Started server process [1568637]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1568637]
+INFO:     Started server process [1568662]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:47272 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47272 - "GET /static/chart.umd.min.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:47272 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47272 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56152 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56152 - "GET /static/chart.umd.min.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:58333 - "GET /static/images/cosmax_logo.png HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:58333 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58333 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56968 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56968 - "GET /static/chart.umd.min.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:59432 - "GET /static/images/cosmax_logo.png HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:59432 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59432 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56032 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56032 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56032 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51298 - "POST /api/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51298 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51298 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55893 - "POST /api/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55893 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55893 - "GET /api/filters HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1568662]
+INFO:     Started server process [1572692]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:44876 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44886 - "GET /static/images/cosmax_logo.png HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:44876 - "GET /static/chart.umd.min.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:44876 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44876 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51217 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51217 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51217 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59343 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59343 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59343 - "GET /api/filters HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1572692]
+INFO:     Started server process [1572821]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:47746 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47746 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47746 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58601 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58601 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58601 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47566 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47566 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47566 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50724 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50724 - "GET /api/data?ref_date=2026-03-25 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50724 - "GET /api/filters HTTP/1.1" 200 OK
