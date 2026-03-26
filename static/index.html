@@ -239,14 +239,10 @@
 
     <div class="container">
         <!-- Summary Cards -->
-        <div class="stats-grid">
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
             <div class="stat-card card-total" onclick="filterByGrade('')">
                 <div class="label">전체 시험중</div>
                 <div class="value" id="sTotal">-</div>
-            </div>
-            <div class="stat-card card-normal" onclick="filterByGrade('정상')">
-                <div class="label">정상 (3일 이내)</div>
-                <div class="value" id="sNormal">-</div>
             </div>
             <div class="stat-card card-over3" onclick="filterByGrade('3일초과')">
                 <div class="label">3일 초과</div>
@@ -295,7 +291,6 @@
                 <div class="filter-group">
                     <label>등급</label>
                     <select id="fGrade"><option value="">전체</option>
-                        <option value="정상">정상</option>
                         <option value="3일초과">3일초과</option>
                         <option value="5일초과">5일초과</option>
                     </select>
@@ -458,10 +453,10 @@ function renderCharts() {
     chartPie = new Chart(document.getElementById('chartPie'), {
         type: 'doughnut',
         data: {
-            labels: ['정상 (3일 이내)', '3일 초과', '5일 초과'],
+            labels: ['3일 초과', '5일 초과'],
             datasets: [{
-                data: [s.normal, s.over3, s.over5],
-                backgroundColor: ['#43a047', '#f57c00', '#e53935'],
+                data: [s.over3, s.over5],
+                backgroundColor: ['#f57c00', '#e53935'],
                 borderWidth: 0,
             }]
         },
@@ -472,7 +467,7 @@ function renderCharts() {
             },
             onClick: (e, elements) => {
                 if (elements.length > 0) {
-                    const gradeMap = ['정상', '3일초과', '5일초과'];
+                    const gradeMap = ['3일초과', '5일초과'];
                     goToDataTab({ grade: gradeMap[elements[0].index] });
                 }
             }
@@ -488,7 +483,6 @@ function renderCharts() {
         data: {
             labels: mgrNames,
             datasets: [
-                { label: '정상', data: mgrNames.map(n => mgr[n].normal), backgroundColor: '#43a047' },
                 { label: '3일초과', data: mgrNames.map(n => mgr[n].over3), backgroundColor: '#f57c00' },
                 { label: '5일초과', data: mgrNames.map(n => mgr[n].over5), backgroundColor: '#e53935' },
             ]
@@ -577,7 +571,6 @@ function renderMgrCards() {
                 <div class="mgr-bar-seg mgr-bar-over5" style="width:${s.over5/total*100}%;"></div>
             </div>
             <div class="mgr-nums">
-                <span class="n-normal">정상 <strong>${s.normal}</strong></span>
                 <span class="n-over3">3일+ <strong>${s.over3}</strong></span>
                 <span class="n-over5">5일+ <strong>${s.over5}</strong></span>
             </div>
