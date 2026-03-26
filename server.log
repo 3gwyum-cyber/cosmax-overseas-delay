@@ -153,3 +153,4 @@ INFO:     127.0.0.1:48076 - "GET /static/chart.umd.min.js HTTP/1.1" 304 Not Modi
 INFO:     127.0.0.1:48088 - "GET /static/images/cosmax_logo.png HTTP/1.1" 304 Not Modified
 INFO:     127.0.0.1:48088 - "GET /api/data?ref_date=2026-03-26 HTTP/1.1" 200 OK
 INFO:     127.0.0.1:48088 - "GET /api/filters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45608 - "GET /api/data?ref_date=2026-03-26 HTTP/1.1" 200 OK
