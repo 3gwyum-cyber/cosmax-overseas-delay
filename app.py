@@ -129,6 +129,21 @@ async def index():
     return (STATIC_DIR / "index.html").read_text(encoding="utf-8")
 
 
+@app.post("/api/deploy")
+async def deploy():
+    import subprocess
+    try:
+        base = Path(__file__).parent
+        result = subprocess.run(
+            ["bash", "-c", f"cd {base} && git add -A && git diff --cached --quiet || git commit -m 'Web Update' && git push origin master"],
+            capture_output=True, text=True, timeout=60
+        )
+        output = result.stdout + result.stderr
+        return {"ok": result.returncode == 0, "message": output.strip() if output.strip() else "변경사항 없음 (이미 최신)"}
+    except Exception as e:
+        return {"ok": False, "message": str(e)}
+
+
 @app.get("/api/data")
 async def get_data(ref_date: Optional[str] = Query(None)):
     rd = parse_ref_date(ref_date)

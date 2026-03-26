@@ -235,6 +235,7 @@
             <div class="ref-date">기준일 <input type="date" id="refDateInput"> <button class="ref-apply" onclick="changeRefDate()">적용</button></div>
             <button class="upload-btn" onclick="toggleUpload()">Upload</button>
             <div class="header-badge">시험중 <strong id="totalBadge">0</strong> cases</div>
+            <button id="deployBtn" class="upload-btn" onclick="webUpdate()">WEB Update</button>
         </div>
     </div>
 
@@ -800,6 +801,22 @@ document.getElementById('fileManager').addEventListener('change', (e) => {
         if (e.dataTransfer.files[0]) uploadFile(e.dataTransfer.files[0], endpoint, statusId);
     });
 });
+
+async function webUpdate() {
+    const btn = document.getElementById('deployBtn');
+    btn.textContent = '배포 중...'; btn.style.background = '#f57c00'; btn.style.color = '#fff'; btn.disabled = true;
+    try {
+        const res = await fetch('/api/deploy', {method:'POST'});
+        const data = await res.json();
+        btn.textContent = data.ok ? '배포 완료!' : '실패';
+        btn.style.background = data.ok ? '#43a047' : '#e53935';
+        alert(data.message);
+    } catch(e) {
+        btn.textContent = '오류'; btn.style.background = '#e53935';
+        alert('배포 실패: ' + e.message);
+    }
+    setTimeout(()=>{ btn.textContent='WEB Update'; btn.style.background='#fff'; btn.style.color='#1a1a1a'; btn.disabled=false; }, 3000);
+}
 
 init();
 </script>
